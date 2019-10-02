@@ -9,16 +9,11 @@ import pyaudio
 import wave
 print("import done")
 #os.putenv('SDL_AUDIODEV', '/dev/snd')
-chunk = 44100
+chunk = 2048
 #pygame.init()
 print("pygame inited")
-f = wave.open("/home/pi/pi-ring/music.wav", "rb")
 p = pyaudio.PyAudio()
 print("music loaded")
-stream = p.open(format = p.get_format_from_width(2),  
-                channels = 1,  
-                rate = 44100,  
-                output = True)
 #dev = usb.core.find(find_all=True)
 #print([dev1 for dev1 in dev])
 
@@ -37,12 +32,17 @@ while True:
 		data = dev.read(endpoint.bEndpointAddress, endpoint.wMaxPacketSize)
 		if data[0] in [1, 2]:
 			#read data  
-			data = f.readframes(chunk)  
+						
+			f = wave.open("/home/pi/pi-ring/music.wav", "rb")
 
+			data = f.readframes(chunk)  
+			stream = p.open(format = p.get_format_from_width(2), channels = 1, rate = 44100, output = True)
 			#play stream  
 			while data:  
 				stream.write(data)  
 				data = f.readframes(chunk)  
+			stream.stop_stream()  
+			stream.close()
 	except usb.core.USBError as e:
 		print(e)
 
